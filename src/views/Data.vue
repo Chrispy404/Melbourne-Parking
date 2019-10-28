@@ -1,6 +1,6 @@
 <template>
 	<div class="home">
-		<h1>The Data</h1>
+		<h1>Find Spaces</h1>
 		<button v-on:click="createMap">create Map</button>
 		<div id="melbMap"></div>
 		<!-- {{freeSpaces}} -->
@@ -37,16 +37,27 @@ export default {
 			}
 		},
 		createMap: function() {
-			// const mapAccessToken =
-			// 	"pk.eyJ1IjoiY3BhbmV0dGEiLCJhIjoiY2syOXdhb3VhMGZ3ZjNrbzFob3BvdGI1NyJ9.BvHYgMwnLli4l2uBvZk0OQ";
-
+			// map name must be the same as Div id name
 			this.map = leaflet.map("melbMap").setView([-37.8136, 144.9631], 14);
+			// credit where credit's due
 			let attribution =
 				'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>';
 
+			// These tiles are al handled by leaflet
 			let tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 			this.tiles = leaflet.tileLayer(tileUrl, { attribution });
 			this.tiles.addTo(this.map);
+
+			this.addMarkers();
+		},
+		addMarkers: function() {
+			for (let i = 0; i < this.freeSpaces.length; i++) {
+				let marker = leaflet.marker([
+					this.freeSpaces[i].lat,
+					this.freeSpaces[i].lon
+				]);
+				marker.addTo(this.map);
+			}
 		}
 	},
 	computed: {},
