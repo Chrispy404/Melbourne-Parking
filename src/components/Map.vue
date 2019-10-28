@@ -1,41 +1,26 @@
 <template>
-	<div class="home">
-		<h1>Find Spaces</h1>
-		<button v-on:click="createMap">create Map</button>
+	<div>
 		<div id="melbMap"></div>
-		<!-- {{freeSpaces}} -->
+		{{displaySpaces}}
 	</div>
 </template>
 
 <script>
-// @ is an alias to /src
-// import Home from "@/components/Home.vue";
-import axios from "axios";
 import leaflet from "leaflet";
 
 export default {
-	name: "data",
-	components: {},
+	name: "map",
+	props: {
+		freeSpaces: Array
+	},
 	data() {
 		return {
-			parkingData: null,
-			freeSpaces: [],
-
-			// map
+			displaySpaces: "",
 			map: null,
-			tiles: null,
-			tileUrl: "",
-			attribution: ""
+			tiles: null
 		};
 	},
 	methods: {
-		findSpaces: function() {
-			for (let i = 0; i < this.parkingData.length; i++) {
-				if (this.parkingData[i].status === "Unoccupied") {
-					this.freeSpaces.push(this.parkingData[i]);
-				}
-			}
-		},
 		createMap: function() {
 			// map name must be the same as Div id name
 			this.map = leaflet.map("melbMap").setView([-37.8136, 144.9631], 14);
@@ -47,10 +32,8 @@ export default {
 			let tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 			this.tiles = leaflet.tileLayer(tileUrl, { attribution });
 			this.tiles.addTo(this.map);
-
-			this.addMarkers();
 		},
-		addMarkers: function() {
+		updateMarkers: function() {
 			for (let i = 0; i < this.freeSpaces.length; i++) {
 				let marker = leaflet.marker([
 					this.freeSpaces[i].lat,
@@ -58,15 +41,21 @@ export default {
 				]);
 				marker.addTo(this.map);
 			}
+		},
+		getData: function() {
+			this.displaySpaces = this.freeSpaces;
 		}
 	},
 	computed: {},
-	created() {
-		axios
-			.get("https://data.melbourne.vic.gov.au/resource/vh2v-4nfs.json")
-			.then(response => (this.parkingData = response.data))
-			.catch(error => console.log(error))
-			.finally(() => this.findSpaces());
+	mounted() {
+		this.createMap();
+		console.log("Free spaces: " + this.freeSpaces);
+		this.displaySpaces = this.freeSpaces;
+	},
+	watch: {
+		freeSpaces() {
+			this.updateMarkers();
+		}
 	}
 };
 </script>
