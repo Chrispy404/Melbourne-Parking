@@ -13,7 +13,6 @@ export default {
 	},
 	methods: {
 		displayData: function() {
-			console.log("going to map");
 			this.$router.push("/map");
 		}
 	}

@@ -21,6 +21,7 @@ export default {
 		return {
 			parkingData: null,
 			freeSpaces: [],
+			timer: "",
 
 			// map
 			map: null,
@@ -30,7 +31,24 @@ export default {
 		};
 	},
 	methods: {
+		getData: function() {
+			let config = {
+				headers: {
+					"X-App-Token": "fAbHz9QDysRavaP5y6iQTkQHo"
+				}
+			};
+
+			axios
+				.get(
+					"https://data.melbourne.vic.gov.au/resource/vh2v-4nfs.json",
+					config
+				)
+				.then(response => (this.parkingData = response.data))
+				.catch(error => console.log(error))
+				.finally(() => this.findSpaces());
+		},
 		findSpaces: function() {
+			this.freeSpaces = [];
 			for (let i = 0; i < this.parkingData.length; i++) {
 				if (this.parkingData[i].status === "Unoccupied") {
 					this.freeSpaces.push(this.parkingData[i]);
@@ -40,11 +58,11 @@ export default {
 	},
 	computed: {},
 	created() {
-		axios
-			.get("https://data.melbourne.vic.gov.au/resource/vh2v-4nfs.json")
-			.then(response => (this.parkingData = response.data))
-			.catch(error => console.log(error))
-			.finally(() => this.findSpaces());
+		this.getData();
+		this.timer = setInterval(this.getData, 60000);
+	},
+	beforeDestroy() {
+		clearInterval(this.timer);
 	}
 };
 </script>

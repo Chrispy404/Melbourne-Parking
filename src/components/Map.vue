@@ -34,6 +34,7 @@ export default {
 			this.tiles.addTo(this.map);
 		},
 		updateMarkers: function() {
+			// does not currently remove old markers
 			for (let i = 0; i < this.freeSpaces.length; i++) {
 				let marker = leaflet.marker([
 					this.freeSpaces[i].lat,
